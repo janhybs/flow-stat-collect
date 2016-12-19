@@ -13,21 +13,21 @@ def load_data(location: str, module: modules.ICollectTool, rules: list=None):
     if not os.path.exists(location):
         raise Exception('Invalid location')
 
-    if os.path.isdir(location):
-        files = recursive_glob(location, module.include)
-        if rules:
-            for rule in rules:
-                files = [f for f in files if rule(f)]
-    else:
-        files = [location]
+    if not os.path.isdir(location):
+        location = os.path.dirname(location)
+
+    files = recursive_glob(location, module.include)
+    if rules:
+        for rule in rules:
+            files = [f for f in files if rule(f)]
 
     result = []
     for file in files:
         result.extend(module.process_file(file))
 
-    print(len(result))
     return result
     # return module.process_file(location)
+
 
 def recursive_glob(root, pattern):
     results = []
@@ -42,13 +42,13 @@ def save_to_database(data: list):
     result = mongo.flat.insert_many(data)
     return result
 
-
-
-data = load_data(
-    '/home/jan-hybs/Dokumenty/Smartgit-flow/flow123d/tests',
-    profiler.Flow123dProfiler(),
-    [
-        # lambda x: str(x).find('0C135049') != -1
-    ]
-)
-print(save_to_database(data))
+# 
+# 
+# data = load_data(
+#     '/home/jan-hybs/Dokumenty/Smartgit-flow/flow123d/tests',
+#     profiler.Flow123dProfiler(),
+#     [
+#         # lambda x: str(x).find('0C135049') != -1
+#     ]
+# )
+# print(save_to_database(data))
