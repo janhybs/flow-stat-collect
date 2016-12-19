@@ -1,2 +1,2 @@
 # flow-stat-collect
-Repository which will collection artifacts from numerous tools
+Repository which will collect artifacts from numerous tools
