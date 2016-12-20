@@ -1,0 +1,16 @@
+# user jan hybs at metacentrum
+ - hostname: "*meta*"
+   username: jan-hybs
+   location: /storage/praha1/home/jan-hybs/projects/Flow123dDocker/flow123d
+
+
+# all others at metacentrum
+ - hostname: "*meta*"
+   username: "*"
+   location: /storage/praha1/home/jan-hybs/projects/Flow123dDocker/flow123d
+
+
+# personal PC
+ - hostname: "janhybs"
+   username: "jan-hybs"
+   location: /home/jan-hybs/projects/Flow123d/flow123d/
