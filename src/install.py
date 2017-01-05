@@ -19,7 +19,7 @@ parser = argparse.ArgumentParser('collect')
 parser.add_argument('-b', '--branch', metavar='NAME', default='master', help="""
     Specify flow123d branch, by default '%(default)s' is used.
 """)
-parser.add_argument('-f', '--flow', metavar='DIR', default='$FLOWLOC', help="""
+parser.add_argument('-f', '--flow', metavar='DIR', default=None, help="""
     Specify where will be flow123d installed.
 """)
 parser.add_argument('-c', '--commit', metavar='HASH', default=None, help="""
