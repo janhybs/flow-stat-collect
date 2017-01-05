@@ -12,7 +12,6 @@
 FLOW_LOC=$1
 
 
-exit 1
 # need to load following modules in order to build flow123d and its libs
 module purge
 module load /software/modules/current/metabase
