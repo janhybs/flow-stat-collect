@@ -33,7 +33,7 @@ make -j4 all
 
 ldd bin/flow123d
 
-create python libs
+# create python libs
 mkdir -p $FLOW_LOC/lib/python
 cd $FLOW_LOC/lib/python
 
