@@ -45,7 +45,7 @@ def check_repo(cwd, branch, commit=None):
     print('Checking repository')
     result = run('git rev-parse --show-toplevel', cwd=cwd)
     if result is not False:
-        print('Found repo root')
+        print('Found repo root %s' % cwd)
     else:
         print('Repo does not exists, creating')
         result = run('git clone https://github.com/flow123d/flow123d.git', cwd)
