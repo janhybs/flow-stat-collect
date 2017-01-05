@@ -4,6 +4,12 @@
    location: /storage/praha1/home/jan-hybs/projects/Flow123dDocker/flow123d
 
 
+# user jan hybs at tarkil
+ - hostname: "*tarkil*"
+   username: jan-hybs
+   location: /storage/praha1/home/jan-hybs/projects/Flow123dDocker/flow123d
+
+
 # all others at metacentrum
  - hostname: "*meta*"
    username: "*"
