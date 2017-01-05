@@ -35,7 +35,7 @@ parser.add_argument('-a', '--all', dest='opts', action='store_const',
                     default=default_options, const=default_options_all, help="""
     If set will run all tags for all tests (by default only tests with tag 'benchmark' will used.
 """)
-parser.add_argument('-r', '--repeat', metavar='N', default=1, help="""
+parser.add_argument('-r', '--repeat', metavar='N', default=1, type=int, help="""
     Number indicating how many times will be runtest script called. Default behaviour is one time.
 """)
 
