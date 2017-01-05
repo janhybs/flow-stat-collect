@@ -1,0 +1,11 @@
+#!/bin/bash
+#PBS -l select=1:ncpus=3:mem=4gb
+#PBS -l walltime=01:59:00
+
+set -x
+cd /storage/praha1/home/jan-hybs/projects/flow-stat-collect
+
+bin/install.sh
+bin/collect.sh --repeat 10
+
+
