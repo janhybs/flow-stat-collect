@@ -6,7 +6,7 @@
 #PBS -l walltime=01:30:00
 #PBS -j oe
 # ::  qsub -l walltime=1h -l nodes=1:ppn=3,mem=4gb -I
-# ::  qsub -l walltime=1:00:00 -l select=1:ncpus=2:mem=4gb -I
+# ::  qsub -l walltime=1:59:00 -l select=1:ncpus=2:mem=4gb -I
 
 # path where flow123d repository is
 FLOW_LOC=$1
@@ -33,7 +33,7 @@ make -j4 all
 
 ldd bin/flow123d
 
-create python libs
+# create python libs
 mkdir -p $FLOW_LOC/lib/python
 cd $FLOW_LOC/lib/python
 
