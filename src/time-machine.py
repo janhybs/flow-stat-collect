@@ -115,8 +115,8 @@ def run(commits):
             '-c', commits[i],
         ]
         print(' '.join(command))
-        fp = open('install.log', 'a+')
-        process = subprocess.Popen(command, stdout=fp, stderr=subprocess.STDOUT)
+        # fp = open('install.log', 'a+') 
+        process = subprocess.Popen(command)#, stdout=fp, stderr=subprocess.STDOUT)
         print(process.wait())
 
         command = [
@@ -125,8 +125,11 @@ def run(commits):
             '-r', '3'
         ]
         print(' '.join(command))
+
+
         process = subprocess.Popen(command)
         print(process.wait())
+        break
 
 
 if __name__ == '__main__':
