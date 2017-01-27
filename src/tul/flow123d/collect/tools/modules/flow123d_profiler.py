@@ -50,6 +50,9 @@ class Flow123dProfiler(ICollectTool):
             with open(status_file, 'r') as fp:
                 status = json.load(fp)
 
+        if 'commit_date' in status:
+            status['commit_date'] = datetime.datetime.fromtimestamp(status['commit_date'])
+
         # convert fields to ints and floats
         self._convert_fields(obj, self._ints,   int)
         self._convert_fields(obj, self._floats, float)

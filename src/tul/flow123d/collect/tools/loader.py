@@ -9,7 +9,6 @@ import tul.flow123d.collect.tools.modules.flow123d_profiler as profiler
 from tul.flow123d.collect.db.mongo import Mongo
 
 
-
 def load_data(location: str, module: modules.ICollectTool, rules: list=None):
     if not os.path.exists(location):
         raise Exception('Invalid location')
