@@ -18,8 +18,8 @@ def main():
     import tul.flow123d.collect.tools.loader as loader
     import tul.flow123d.collect.tools.modules.flow123d_profiler as profiler
 
-    default_options = '--include benchmark --no-compare --no-clean --status-file'
-    default_options_all = '--no-compare --no-clean --status-file'
+    default_options = '--include benchmark --no-compare --no-clean --status-file -a'
+    default_options_all = '--no-compare --no-clean --status-file -a'
 
     # prepare parser
     parser = argparse.ArgumentParser('collect')
