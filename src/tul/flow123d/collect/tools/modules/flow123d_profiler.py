@@ -50,8 +50,9 @@ class Flow123dProfiler(ICollectTool):
             with open(status_file, 'r') as fp:
                 status = json.load(fp)
 
-        if 'commit_date' in status:
-            status['commit_date'] = datetime.datetime.fromtimestamp(status['commit_date'])
+        # convert unix timestamp to datetime class to mongo interprets is correctly
+        if 'commit' in status and status['commit'] and 'date' in status['commit']:
+            status['commit']['date'] = datetime.datetime.fromtimestamp(status['commit']['date'])
 
         # convert fields to ints and floats
         self._convert_fields(obj, self._ints,   int)
