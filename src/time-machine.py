@@ -35,8 +35,14 @@ def main():
     parser.add_argument('--no-git', action='store_true', default=False, help="""
         If set, will omit repository checkout and pull.
     """)
+    parser.add_argument('--hide-install', action='store_true', default=False, help="""
+        If set, will redirect install to install.log
+    """)
+    parser.add_argument('--hide-collect', action='store_true', default=False, help="""
+        If set, will redirect collect to collect.log
+    """)
     parser.add_argument('rest', nargs='*', default=[], help="""
-        If set, will omit repository checkout and pull.
+        Additional arguments passed to collect.py
     """)
 
     args = parser.parse_args()
@@ -102,35 +108,40 @@ def main():
             for i in range(4):
                 print(fs.format(c=commits.commit_detail(i - 4)))
 
-    run(commits, args.rest)
+    run(commits, args)
 
 
-def run(commits, rest):
+def run(commits, args):
     print('-' * 80)
     import install
     import collect
     import subprocess
     for i in range(len(commits)):
         print('State {:>3d} of {:<3d} ({})'.format(i + 1, len(commits), commits[i]))
+        stdout = open('install.log', 'a+') if args.hide_install else None
         command = [
             sys.executable,
             install.__file__,
             '-c', commits[i],
         ]
         print(' '.join(command))
-        process = subprocess.Popen(command)
-        print(process.wait())
+        process = subprocess.Popen(command, stderr=subprocess.STDOUT, stdout=stdout)
+        process.wait()
+        if args.hide_install:
+            stdout.close()
 
         command = [
             sys.executable,
             collect.__file__,
-        ]
-        if rest:
-            command.extend(rest)
+        ] + args.rest
+        
         print(' '.join(command))
+        stdout = open('install.log', 'a+') if args.hide_install else None
+        process = subprocess.Popen(command, stderr=subprocess.STDOUT, stdout=stdout)
+        process.wait()
 
-        process = subprocess.Popen(command)
-        print(process.wait())
+        if args.hide_collect:
+            stdout.close()
 
 
 if __name__ == '__main__':
