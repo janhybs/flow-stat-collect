@@ -62,7 +62,7 @@ def main():
 
         # prepare random variables
         rnd = random_hex(8)
-        eq_lambda = lambda x: str(x).find(rnd) != -1
+        eq_lambda = [lambda x: str(x).find(rnd) != -1]
 
         # build command
         command = [runtest] + arg_options.test
@@ -80,9 +80,11 @@ def main():
         def load_data():
             data = list()
             for t in arg_options.test:
-                items = loader.load_data(join(flow_root, t), profiler.Flow123dProfiler(), [eq_lambda])
-                data.extend(items)
+                instance = profiler.Flow123dProfiler()
+                path = join(flow_root, t)
+                items = loader.load_data(path, instance, eq_lambda)
                 print('  - Found %d items in %s' % (len(items), t))
+                data.extend(items)
 
             if data:
                 print('Inserting %d items to database' % len(data))
@@ -100,8 +102,8 @@ def main():
             total += load_data()
         else:
             # print error on error
-            print('[ ERROR ] | Error while executing command, return code %d' % process.returncode)
-            sys.exit(1)
+            print('[ WARN ] | Error while executing command, return code %d' % process.returncode)
+            total += load_data()
 
     print('=' * 80)
     print("Inserted total of %d documents" % total)

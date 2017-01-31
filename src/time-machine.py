@@ -35,12 +35,15 @@ def main():
     parser.add_argument('--no-git', action='store_true', default=False, help="""
         If set, will omit repository checkout and pull.
     """)
-
+    parser.add_argument('rest', nargs='*', default=[], help="""
+        If set, will omit repository checkout and pull.
+    """)
 
     args = parser.parse_args()
     args.flow = args.flow or cfg.get_flow123d_root()
     flow_root = args.flow
     git = Repo(flow_root)
+
 
     fs = '{c[short]} | {c[email]:^20s} | {c[timestamp]} | {c[ago]:14s}'
 
@@ -99,10 +102,10 @@ def main():
             for i in range(4):
                 print(fs.format(c=commits.commit_detail(i - 4)))
 
-    run(commits)
+    run(commits, args.rest)
 
 
-def run(commits):
+def run(commits, rest):
     print('-' * 80)
     import install
     import collect
@@ -121,8 +124,9 @@ def run(commits):
         command = [
             sys.executable,
             collect.__file__,
-            '-r', '3'
         ]
+        if rest:
+            command.extend(rest)
         print(' '.join(command))
 
         process = subprocess.Popen(command)

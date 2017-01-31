@@ -8,10 +8,15 @@ import json
 import hashlib
 import datetime
 
-from tul.flow123d.collect.tools.modules import ICollectTool
+from tul.flow123d.collect.tools.modules import ICollectTool, CollectResult, LogPolicy
 
 
 class Flow123dProfiler(ICollectTool):
+    """
+    Class Flow123dProfiler is module for project Flow123d
+    This module processes json profiler data and runtest.status.json files
+    """
+
     include = 'profiler_info_*.log.json'
     exclude = None
 
@@ -40,7 +45,11 @@ class Flow123dProfiler(ICollectTool):
     def _parse_date(s:str) -> datetime.datetime:
         return datetime.datetime.strptime(s, '%m/%d/%y %H:%M:%S').timestamp()
 
-    def process_file(self, f: str):
+    def process_file(self, f: str) -> CollectResult:
+        """
+        Method processes single file and return collect result
+        :param f: file location
+        """
         with open(f, 'r') as fp:
             obj = json.load(fp)
 
@@ -66,7 +75,24 @@ class Flow123dProfiler(ICollectTool):
         base['case-name'] = parts[-2].split('.')[0]
         base.update(status)
 
-        return self._unwind(start, list(), base)
+        # determine returncode
+        returncode = status.get('returncode') if status and 'returncode' in status else None
+        error_file = os.path.join(os.path.dirname(f), 'job_output.log')
+        logs = []
+        if returncode not in (0, None) and os.path.exists(error_file):
+            logs.append(error_file)
+
+        items = self._unwind(start, list(), base)
+        item = CollectResult(
+            items=items,
+            log_policy=LogPolicy.ON_ERROR,
+            log_folder=os.path.dirname(f),
+            logs=[
+                os.path.join(os.path.dirname(f), 'job_output.log'),
+                os.path.join(os.path.dirname(f), 'flow123.0.log')
+            ],
+        )
+        return item
 
     def _get_base(self, obj: dict) -> (dict, dict):
         if not obj or self._children not in obj:

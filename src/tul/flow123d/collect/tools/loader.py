@@ -4,9 +4,11 @@
 
 import os
 import fnmatch
+
 import tul.flow123d.collect.tools.modules as modules
 import tul.flow123d.collect.tools.modules.flow123d_profiler as profiler
 from tul.flow123d.collect.db.mongo import Mongo
+from tul.flow123d.collect.tools.modules import CollectResult
 
 
 def load_data(location: str, module: modules.ICollectTool, rules: list=None):
@@ -23,10 +25,9 @@ def load_data(location: str, module: modules.ICollectTool, rules: list=None):
 
     result = []
     for file in files:
-        result.extend(module.process_file(file))
+        result.append(module.process_file(file))
 
     return result
-    # return module.process_file(location)
 
 
 def recursive_glob(root, pattern):
@@ -37,18 +38,20 @@ def recursive_glob(root, pattern):
     return results
 
 
-def save_to_database(data: list):
+def save_to_database(data):
+    """
+    :type data: list[CollectResult]
+    """
     mongo = Mongo.init()
-    result = mongo.flat.insert_many(data)
-    return result
+    results = list()
+    for item in data:
 
-# 
-# 
-# data = load_data(
-#     '/home/jan-hybs/Dokumenty/Smartgit-flow/flow123d/tests',
-#     profiler.Flow123dProfiler(),
-#     [
-#         # lambda x: str(x).find('0C135049') != -1
-#     ]
-# )
-# print(save_to_database(data))
+        # save logs first
+        if item.logs and item.items:
+            log_ids = mongo.fs.insert_many(item.logs).inserted_ids
+            item.update(log_ids)
+
+        # insert rest to db
+        if item.items:
+            results.append(mongo.flat.insert_many(item.items))
+    return results
