@@ -50,6 +50,7 @@ class Flow123dProfiler(ICollectTool):
         Method processes single file and return collect result
         :param f: file location
         """
+        print("Processing %s" % f)
         with open(f, 'r') as fp:
             obj = json.load(fp)
 
@@ -114,6 +115,10 @@ class Flow123dProfiler(ICollectTool):
                 self._convert_fields(child, fields, method)
 
     def _unwind(self, obj: dict, result: list, base: dict = None, path: str = ''):
+        # empty obj
+        if not obj:
+            return result
+            
         item = obj.copy()
         if self._children in item:
             del item[self._children]
