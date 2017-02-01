@@ -45,6 +45,29 @@ class Flow123dProfiler(ICollectTool):
     def _parse_date(s:str) -> datetime.datetime:
         return datetime.datetime.strptime(s, '%m/%d/%y %H:%M:%S').timestamp()
 
+    def try2extract_from_dummy(self, d: str, status):
+        pcs = d.split('.')
+        if len(pcs) == 3:
+            name, cpu, el = pcs
+            pcs = el.split('_')
+            el = int(pcs[1]) if len(pcs) == 3 else int(pcs[0])
+        elif len(pcs) == 2:
+            name, cpu = pcs
+            el = 0
+        else:
+            name = d
+            cpu = 0
+            el = 0
+        return {
+            'task-size': el,
+            'run-process-count': int(cpu),
+            'children': [
+                {
+                    'tag': 'Whole Program'
+                }
+            ]
+        }
+
     def process_file(self, f: str) -> CollectResult:
         """
         Method processes single file and return collect result
@@ -59,6 +82,10 @@ class Flow123dProfiler(ICollectTool):
         if os.path.exists(status_file):
             with open(status_file, 'r') as fp:
                 status = json.load(fp)
+
+        # is this just dummy profiler:
+        if not obj:
+            obj = self.try2extract_from_dummy(os.path.basename(os.path.dirname(f)), status)
 
         # convert unix timestamp to datetime class to mongo interprets is correctly
         if 'commit' in status and status['commit'] and 'date' in status['commit']:
@@ -75,13 +102,6 @@ class Flow123dProfiler(ICollectTool):
         base['test-name'] = parts[-4]
         base['case-name'] = parts[-2].split('.')[0]
         base.update(status)
-
-        # determine returncode
-        returncode = status.get('returncode') if status and 'returncode' in status else None
-        error_file = os.path.join(os.path.dirname(f), 'job_output.log')
-        logs = []
-        if returncode not in (0, None) and os.path.exists(error_file):
-            logs.append(error_file)
 
         items = self._unwind(start, list(), base)
         item = CollectResult(
