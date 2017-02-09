@@ -57,7 +57,7 @@ def main():
     builder.time = '1:00:00'
     builder.ncpus = '2'
     # builder.script = 'python3', __root__
-    builder.script = 'python3', join(__root__, 'collect.py'), '-f', cfg.host_config.get('location')
+    builder.script = 'python3', join(__dir__, 'collect.py'), '-f', cfg.host_config.get('location')
 
     for cluster in args.cluster:
         builder.cluster = cluster
