@@ -4,6 +4,7 @@
 
 from os.path import abspath, join, dirname
 import sys
+import os
 import argparse
 import importlib
 
@@ -48,19 +49,25 @@ def main():
         location='/storage/praha1/home/jan-hybs/projects/Flow123dDocker/flow123d'
         )
     )
-    
+
     module = cfg.host_config.get('type')
-    print(module)
+    module = 'pbspro'
 
     builder = load_builder(module)
     builder.time = '1:00:00'
-    builder.cluster = 'ajax'
-    builder.script = 'python3', __root__
-    builder.script = 'python3'
-    print(builder.command)
-    print(builder.header)
+    # builder.script = 'python3', __root__
+    builder.script = 'python3', join(__root__, 'collect.py'), '-f', cfg.host_config.get('location')
 
-    print(args)
+    for cluster in args.cluster:
+        builder.cluster = cluster
+        filename = './pbs_%s.sh' % cluster
+        with open(filename, 'w') as fp:
+            fp.write(builder.header)
+            os.chmod(filename, 0o755)
+        print('qsub', filename)
+
+    # print(builder.command)
+    # print(builder.header)
 
     # args = parser.parse_args()
     # args.flow = args.flow or cfg.get_flow123d_root()
