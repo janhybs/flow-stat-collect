@@ -55,6 +55,7 @@ def main():
 
     builder = load_builder(module)
     builder.time = '1:00:00'
+    builder.ncpus = '2'
     # builder.script = 'python3', __root__
     builder.script = 'python3', join(__root__, 'collect.py'), '-f', cfg.host_config.get('location')
 
