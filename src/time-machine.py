@@ -50,7 +50,6 @@ def main():
     flow_root = args.flow
     git = Repo(flow_root)
 
-
     fs = '{c[short]} | {c[email]:^20s} | {c[timestamp]} | {c[ago]:14s}'
 
     # perform repo check and init
@@ -134,7 +133,7 @@ def run(commits, args):
             sys.executable,
             collect.__file__,
         ] + args.rest
-        
+
         print(' '.join(command))
         stdout = open('install.log', 'a+') if args.hide_install else None
         process = subprocess.Popen(command, stderr=subprocess.STDOUT, stdout=stdout)

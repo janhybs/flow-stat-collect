@@ -9,6 +9,7 @@ import argparse
 __dir__ = dirname(__file__)
 __root__ = dirname(__dir__)
 
+
 def main():
     sys.path.append(abspath(join(__root__, 'libs')))
 
@@ -38,6 +39,7 @@ def main():
         If set, will omit installation testing
     """)
 
+    cfg.init()
     args = parser.parse_args()
     args.flow = args.flow or cfg.get_flow123d_root()
     flow_root = args.flow

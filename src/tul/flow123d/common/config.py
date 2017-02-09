@@ -11,7 +11,8 @@ __root__ = abspath(join(__file__, '../' * 5))
 class Config(object):
     """
     Class Config is global config class
-    :type _rules     : list[dict]
+    :type _rules            : list[dict]
+    :type host_config       : dict
     """
 
     _rules = None
@@ -20,16 +21,13 @@ class Config(object):
     _inited = None
     _root = __root__
     _default_flow123d_root = abspath(join(__root__, '../Flow123d/flow123d'))
+    host_config = None
 
     @classmethod
     def get_flow123d_root(cls):
         cls.init()
-        for rule in cls._rules:
-            host = fnmatch.fnmatch(cls._hostname, rule.get('hostname'))
-            user = fnmatch.fnmatch(cls._username, rule.get('username'))
-
-            if user and host:
-                return rule.get('location')
+        if cls.host_config:
+            return cls.host_config.get('location')
 
         return cls._default_flow123d_root
 
@@ -49,5 +47,13 @@ class Config(object):
         with open(join(cls._root, 'cfg/host_table.yaml'), 'r') as fp:
             cls._rules = yaml.load(fp)
 
+        for rule in cls._rules:
+            host = fnmatch.fnmatch(cls._hostname, rule.get('hostname'))
+            user = fnmatch.fnmatch(cls._username, rule.get('username'))
+
+            if user and host:
+                cls.host_config = rule
+                return
+        raise LookupError("Cannot find rule for host %s, user %s" % (cls._hostname, cls._username))
 
 cfg = Config

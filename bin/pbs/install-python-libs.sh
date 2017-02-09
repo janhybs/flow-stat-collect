@@ -4,7 +4,7 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # get script location
-PROJECT_ROOT="$( cd "$SCRIPT_DIR/.." && pwd )"
+PROJECT_ROOT="$( cd "$SCRIPT_DIR/../.." && pwd )"
 
 
 # load module for pip3

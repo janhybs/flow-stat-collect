@@ -19,7 +19,9 @@ module load cmake-2.8.12
 module load gcc-4.9.2
 module load boost-1.56-gcc
 module load perl-5.20.1-gcc
+#module load mpich-3.0.2-gcc
 module load openmpi
+
 
 module load python27-modules-gcc
 module load python-2.7.10-gcc
