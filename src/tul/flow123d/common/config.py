@@ -32,7 +32,7 @@ class Config(object):
         return cls._default_flow123d_root
 
     @classmethod
-    def init(cls):
+    def init(cls, default_config=None):
         if cls._inited:
             return
 
@@ -54,6 +54,11 @@ class Config(object):
             if user and host:
                 cls.host_config = rule
                 return
+
+        if default_config:
+            cls.host_config = default_config
+            return
+
         raise LookupError("Cannot find rule for host %s, user %s" % (cls._hostname, cls._username))
 
 cfg = Config

@@ -43,7 +43,12 @@ def main():
 
     args = parser.parse_args()
 
-    cfg.init()
+    cfg.init(dict(
+        type='pbspro',
+        location='/storage/praha1/home/jan-hybs/projects/Flow123dDocker/flow123d'
+        )
+    )
+    
     module = cfg.host_config.get('type')
     print(module)
 
