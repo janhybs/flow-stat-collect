@@ -91,3 +91,4 @@ ENV/
 # idea folder
 /.idea/
 pbs_*.sh
+.config.yaml

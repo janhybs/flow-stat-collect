@@ -90,3 +90,20 @@ class QSubAssembler(object):
             else:
                 command.append(self.script)
         return command
+
+    @property
+    def interactive(self):
+        command = ['qsub']
+
+        if self.time:
+            command.extend([
+                '-l', 'walltime=' + self.time
+            ])
+
+        if self.select:
+            command.extend([
+                '-l', self.select
+            ])
+        command.append('-I')
+
+        return command

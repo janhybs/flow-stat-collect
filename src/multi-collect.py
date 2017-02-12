@@ -7,9 +7,15 @@ import sys
 import os
 import argparse
 import importlib
+import subprocess
 
-__dir__ = dirname(__file__)
+__dir__ = abspath(dirname(__file__))
 __root__ = dirname(__dir__)
+
+
+all_clusters = [
+    'ajax', 'exmag', 'gram', 'hildor', 'luna', 'mudrc', 'tarkil'
+]
 
 
 def load_builder(module='pbspro'):
@@ -22,14 +28,18 @@ def load_builder(module='pbspro'):
 def main():
     sys.path.append(abspath(join(__root__, 'libs')))
 
-    import tul.flow123d.utils.install.flow123d as flow
     from tul.flow123d.common.config import cfg
-    from tul.flow123d.csv.git import Repo
 
     # prepare parser
     parser = argparse.ArgumentParser('multi-collect')
-    parser.add_argument('cluster', metavar='CLUSTER', nargs='+', help="""
-        Specify flow123d branch, by default '%(default)s' is used.
+    parser.add_argument('cluster', metavar='CLUSTER', nargs='*', default=['ALL'], help="""
+        Specify flow123d branch, by default '%(default)s' is used. value ALL means all clusters:
+        'ajax', 'exmag', 'gram', 'hildor', 'luna', 'mudrc', 'tarkil'. Default value is ALL
+    """)
+
+    parser.add_argument('-p', '--property', metavar='NAME=VALUE', action='append', help="""
+        Property which will be overridden in format -p | --property NAME=VALUE.
+        Allowed NAME values are nnodes, nproc, time, mem
     """)
 
     parser.add_argument('--no-git', action='store_true', default=False, help="""
@@ -43,6 +53,9 @@ def main():
     """)
 
     args = parser.parse_args()
+    if 'ALL' in args.cluster:
+        rest = set(args.cluster) - {'ALL'}
+        args.cluster = all_clusters + list(rest)
 
     cfg.init(dict(
         type='pbspro',
@@ -50,25 +63,55 @@ def main():
         )
     )
 
+    # detect module
     module = cfg.host_config.get('type')
     module = 'pbspro'
 
+    # set default values
     builder = load_builder(module)
-    builder.time = '1:00:00'
+    builder.time = '1:59:00'
     builder.ncpus = '2'
-    # builder.script = 'python3', __root__
+    builder.nnodes = '1'
     builder.script = 'python3', join(__dir__, 'collect.py'), '-f', cfg.host_config.get('location')
 
-    for cluster in args.cluster:
-        builder.cluster = cluster
-        filename = './pbs_%s.sh' % cluster
-        with open(filename, 'w') as fp:
-            fp.write(builder.header)
-            os.chmod(filename, 0o755)
-        print('qsub', filename)
+    # override default values
+    if args.property:
+        print('Global override: ')
+        for prop in args.property:
+            key, value = str(prop).split('=', 1)
+            setattr(builder, key, value)
+            print(' - {:8s} = {}'.format(key, value))
+        print('-' * 60)
 
-    # print(builder.command)
-    # print(builder.header)
+    if args.cluster:
+        print('Generating scripts: ')
+        for cluster in args.cluster:
+            builder.cluster = cluster
+            filename = './pbs_%s.sh' % cluster
+            with open(filename, 'w') as fp:
+                fp.write(builder.header)
+                os.chmod(filename, 0o755)
+            print('[ OK ] | qsub generated', filename)
+        print('-' * 60)
+
+    # print debug info
+    print('Debug info: ')
+    print('-' * 60)
+    print(builder.header.rstrip())
+    print('-' * 60)
+
+    if args.cluster:
+        print('Executing scripts: ')
+        for cluster in args.cluster:
+            builder.cluster = cluster
+            filename = os.path.abspath('./pbs_%s.sh' % cluster)
+            command = ['qsub', filename]
+            print('[    ] | Executing', ' '.join((command)))
+            process = subprocess.Popen(command)
+            process.wait()
+            print('[ OK ] | done')
+
+        print('-' * 60)
 
     # args = parser.parse_args()
     # args.flow = args.flow or cfg.get_flow123d_root()

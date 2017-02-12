@@ -48,6 +48,10 @@ def main():
     args.test = ['bench_data/benchmarks'] if not args.test else args.test
     args.flow = args.flow or cfg.get_flow123d_root()
     flow_root = args.flow
+    
+    # node bench config
+    node_bench_root = join(args.flow, 'node-benchmarks/src/')
+    node_bench_command = ['python3', 'run.py']
 
     # runtest wrapper
     runtest = abspath(join(flow_root, 'tests/runtest'))
@@ -80,9 +84,15 @@ def main():
             print(info_template.format(**locals()))
             print('=' * 80)
 
-            # run process
+            # run process runtest
             process = subprocess.Popen(command, cwd=flow_root)
             process.wait()
+
+            # run node bench process
+            for idea in range(8):
+                command = node_bench_command
+                process_bench = subprocess.Popen(command, cwd=node_bench_root)
+                process_bench.wait()
 
         def load_data():
             data = list()
